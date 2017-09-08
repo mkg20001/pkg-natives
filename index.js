@@ -25,7 +25,7 @@ function isInArray(field, value, list) {
 //Conf
 const modes = ["bundle", "dir"]
 const scans = ["all", "entry", "manual"]
-const _conf = pdata["pkg-native"]
+const _conf = pdata["pkg-native"] || {}
 const _defaults = {
   scan: "all",
   mode: "bundle",
@@ -95,7 +95,7 @@ nat.forEach(n => {
 console.log(meta)
 
 const l = fs.readFileSync(__dirname + "/loader.js").toString()
-  .replace('"MODENAME"', mode).replace('"MODEDIR"', JSON.stringify("")).replace('"METADATA"', JSON.stringify(meta))
+  .replace('"MODENAME"', JSON.stringify(mode)).replace('"MODEDIR"', JSON.stringify("")).replace('"METADATA"', JSON.stringify(meta))
 fs.writeFileSync(loader, Buffer.from(l))
 
 const binf = path.join(mod, pdata.bin[Object.keys(pdata.bin)])
@@ -105,6 +105,9 @@ const obinc = fs.readFileSync(binf)
 
 const suline = binc.filter(l => l.startsWith("#!") || l.indexOf("use strict") != -1).slice(0, 2)
 
+let loader_relative = path.relative(path.dirname(binf), path.join(mod, "native-loader.js"))
+if (!loader_relative.startsWith(".")) loader_relative = "./" + loader_relative
+
 let dropped = false
 
 const nbinc = binc.map(l => {
@@ -113,7 +116,7 @@ const nbinc = binc.map(l => {
     return l
   } else {
     if (!dropped) {
-      l = 'require("' + path.relative(path.dirname(binf), path.join(mod, "native-loader.js")) + '");' + l
+      l = 'require("' + loader_relative + '");' + l
       dropped = true
     }
     return l

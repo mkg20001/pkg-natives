@@ -5,6 +5,9 @@
   "bin": {
     "pkg-natives": "index.js"
   },
+  "pkg": {
+    "assets": "loader.js"
+  },
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
