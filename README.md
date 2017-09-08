@@ -20,6 +20,8 @@ Put natives in a pkg binary
 ```
 
 # Limitations
- - Linux only (mac maybe?)
- - Only current node version
- - Buggy
+ - Only current node version & os
+
+ This is due to the fact that otherwise the natives for the other version/os would have to be downloaded/built
+
+ This is a goal that may be achived later but not now
