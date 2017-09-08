@@ -24,6 +24,7 @@
     "mkdirp": "^0.5.1",
     "pkg": "^4.2.4",
     "rimraf": "^2.6.1",
+    "upath": "^1.0.0",
     "uuid": "^3.1.0"
   },
   "devDependencies": {},
