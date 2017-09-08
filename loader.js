@@ -13,7 +13,10 @@ function NativeLoader(mode, dir, meta) {
     const _m = meta[mod]
     switch (mode) {
     case "bundle":
-      _m.get_file = path.join(__dirname, "natives", mod)
+      const from = path.join(__dirname, "natives", mod)
+      const to = path.join("/tmp/", Math.random() + ".node")
+      fs.writeFileSync(to, fs.readFileSync(from))
+      _m.get_file = to
       break;
     }
     if (!fs.existsSync(_m.get_file)) missing.push(_m.get_file)
