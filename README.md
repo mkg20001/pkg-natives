@@ -11,9 +11,9 @@ Put natives in a pkg binary
   "pkg": {
     "assets": "natives/**" //this tells pkg to drop the natives into the binary (if you already have sth else in this filed just turn it into an array)
   },
-  "pkg-native": {
+  "pkg-native": { //these are the defaults
     "scan": "all", //all = scan all modules recursivly for natives, entry = scan only the entry file and all files it requires recursivly, manual = do nothing
-    "mode": "bundle", //bundle = put the natives in the pkg binary, dir = the natives need to be in the folder of the executable
+    "mode": "bundle", //bundle = put the natives in the pkg binary, dir = the natives need to be in the folder of the executable, static = file need to be in the dir specified with option "static"
     "modules": [] //module that pkg-natives may have missed
   }
 }

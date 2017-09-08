@@ -49,9 +49,21 @@ const natives = path.join(mod, "natives")
 
 console.log("Pkg'ing module %s...", pdata.name)
 
+fs.readdirSync(node_modules).forEach(mod => {
+  if (mod == ".bin" || mod.startsWith("@")) return
+  const mod_pjson = require(path.join(node_modules, mod, "package.json"))
+  if (!mod_pjson.main) return
+  if (mod_pjson.main.endsWith(".node") || fs.existsSync(path.join(node_modules, mod, mod_pjson.main + ".node"))) {
+    console.log("package.json main of %s directly points to native %s! Fixing that...", mod, mod_pjson.main)
+    mod_pjson.main = "index.js"
+    fs.writeFileSync(path.join(node_modules, mod, "index.js"), Buffer.from('require("bindings")(' + JSON.stringify(mod) + ')'))
+    fs.writeFileSync(path.join(node_modules, mod, "package.json"), Buffer.from(JSON.stringify(mod_pjson)))
+  }
+})
+
 console.log("Scanning for natives (%s)...", scan)
 
-const tree = getFlatTree(scan == "all" ? [entry, Buffer.from(fs.readdirSync(node_modules).map(m => 'require("' + m + '")').join(";\n"))] : scan == "entry" ? [entry] : [], {
+const tree = getFlatTree(scan == "all" ? [entry, Buffer.from(fs.readdirSync(node_modules).map(m => 'require(' + JSON.stringify(m) + ')').join(";\n"))] : scan == "entry" ? [entry] : [], {
   node: node_modules,
   main: mod
 })
@@ -64,9 +76,12 @@ for (var pth in tree) {
   if (b.length) btree[pth] = obj
 }
 
-const nfiles = Object.keys(btree)
+let nfiles = Object.keys(btree)
 
-console.log("Found %s native(s) (%s)", nfiles.length, nfiles.join(", ") || "<no files with natives were found>")
+console.log("Found %s native(s)", nfiles.length)
+
+console.log("Adding %s native(s) manually", conf.modules.length)
+nfiles = nfiles.concat(conf.modules)
 
 let nat = []
 
@@ -75,11 +90,10 @@ nfiles.forEach(file => nat.push({
   native: file.split("/")[1]
 }))
 
-nat.forEach(n =>
-  n.module = find_native(node_modules, n.native))
-
-nat.forEach(n =>
-  console.log("%s at %s (from %s)", n.native, n.module, n.file))
+nat.forEach(n => {
+  n.module = find_native(node_modules, n.native)
+  console.log("%s at %s (from %s)", n.native, n.module, n.file)
+})
 
 console.log("Copying modules...")
 
