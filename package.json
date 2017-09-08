@@ -10,7 +10,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "test": "cd test && bash index.js"
+    "test": "cd test && bash index.sh"
   },
   "keywords": [
     "pkg",
