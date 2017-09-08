@@ -1,0 +1,24 @@
+{
+  "name": "pkg-natives",
+  "version": "0.0.1",
+  "description": "Put natives in a pkg binary",
+  "bin": {
+    "pkg-natives": "index.js"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "pkg",
+    "natives"
+  ],
+  "author": "Maciej Krüger <mkg20001@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "debug": "^3.0.1",
+    "mkdirp": "^0.5.1",
+    "pkg": "^4.2.4",
+    "rimraf": "^2.6.1"
+  }
+}
