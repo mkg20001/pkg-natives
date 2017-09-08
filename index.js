@@ -134,7 +134,7 @@ const nbinc = binc.map(l => {
     return l
   } else {
     if (!dropped) {
-      l = 'require("' + loader_relative + '");' + l
+      l = 'require(' + JSON.stringify(loader_relative) + ');' + l
       dropped = true
     }
     return l
