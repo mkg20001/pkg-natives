@@ -7,7 +7,7 @@ mkdir -p $tmp
 cd testpkg
   set -e
   npm i
-  npm run pkgv -- -t "$(node -e 'process.platform.replace(/[^a-z]/gmi, \"\")' -p)"
+  npm run pkgv -- -t "$(node -e 'process.platform.replace(/[^a-z]/gmi, "")' -p)"
   mv testpkg $tmp/vanilla
   npm run pkg
   mv testpkg $tmp/native
