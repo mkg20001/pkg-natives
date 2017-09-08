@@ -1,0 +1,23 @@
+{
+  "name": "testpkg",
+  "version": "0.0.0",
+  "description": "Just testing C/C++ addon stuff",
+  "main": "index.js",
+  "pkg": {
+    "assets": "natives/**"
+  },
+  "bin": {
+    "testpkg": "index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "pkg": "pkg-natives",
+    "pkgv": "pkg . -t linux"
+  },
+  "author": "Maciej Krüger <mkg20001@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "leveldown": "^1.7.2"
+  },
+  "devDependencies": {}
+}

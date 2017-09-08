@@ -1,2 +1,4 @@
 node_modules
-pkg-natives
+/pkg-natives*
+/test/testpkg/testpkg*
+testdb
