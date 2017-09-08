@@ -87,7 +87,7 @@ let nat = []
 
 nfiles.forEach(file => nat.push({
   file,
-  native: file.split("/")[1]
+  native: file.split(path.sep)[1]
 }))
 
 nat.forEach(n => {
@@ -124,7 +124,7 @@ const obinc = fs.readFileSync(binf)
 const suline = binc.filter(l => l.startsWith("#!") || l.indexOf("use strict") != -1).slice(0, 2)
 
 let loader_relative = path.relative(path.dirname(binf), path.join(mod, "native-loader.js"))
-if (!loader_relative.startsWith(".")) loader_relative = "./" + loader_relative
+if (!loader_relative.startsWith(".")) loader_relative = "." + path.sep + loader_relative
 
 let dropped = false
 
