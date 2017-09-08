@@ -12,7 +12,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "pkg": "pkg-natives",
-    "pkgv": "pkg . -t linux"
+    "pkgv": "pkg ."
   },
   "author": "Maciej Krüger <mkg20001@gmail.com>",
   "license": "ISC",
