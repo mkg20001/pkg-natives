@@ -124,8 +124,8 @@ const obinc = fs.readFileSync(binf)
 
 const suline = binc.filter(l => l.startsWith("#!") || l.indexOf("use strict") != -1).slice(0, 2)
 
-let loader_relative = path.relative(path.dirname(binf), path.join(mod, "native-loader.js"))
-if (!loader_relative.startsWith(".")) loader_relative = "." + path.sep + loader_relative
+let loader_relative = upath.normalize(path.relative(path.dirname(binf), path.join(mod, "native-loader.js")))
+if (!loader_relative.startsWith(".")) loader_relative = "./" + loader_relative
 
 let dropped = false
 
@@ -135,7 +135,7 @@ const nbinc = binc.map(l => {
     return l
   } else {
     if (!dropped) {
-      l = 'require(' + JSON.stringify(upath.normalize(loader_relative)) + ');' + l
+      l = 'require(' + JSON.stringify(loader_relative) + ');' + l
       dropped = true
     }
     return l
