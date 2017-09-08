@@ -143,7 +143,7 @@ const nbinc = binc.map(l => {
 
 fs.writeFileSync(binf, Buffer.from(nbinc))
 
-const pargs = ["-t", "node" + process.version.substr(1, 1) + "-" + process.platform.replace(/[^a-z]/gmi), mod]
+const pargs = ["-t", "node" + process.version.substr(1, 1) + "-" + process.platform.replace(/[^a-z]/gmi, ""), mod]
 
 const rest = () => {
   console.log("Restore %s...", binf)
