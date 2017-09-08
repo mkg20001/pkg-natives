@@ -1,6 +1,6 @@
 {
   "name": "pkg-natives",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Put natives in a pkg binary",
   "bin": {
     "pkg-natives": "index.js"
