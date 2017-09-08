@@ -1,6 +1,6 @@
 {
   "name": "pkg-natives",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Put natives in a pkg binary",
   "bin": {
     "pkg-natives": "index.js"
@@ -20,5 +20,14 @@
     "mkdirp": "^0.5.1",
     "pkg": "^4.2.4",
     "rimraf": "^2.6.1"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mkg20001/pkg-natives.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mkg20001/pkg-natives/issues"
+  },
+  "homepage": "https://github.com/mkg20001/pkg-natives#readme"
 }
