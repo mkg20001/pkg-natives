@@ -5,24 +5,55 @@
 const pkg = require("pkg")
 const fs = require("fs")
 const path = require("path")
+const {
+  getFlatTree
+} = require("./lib/tree")
+const find_native = require("./lib/find_native")
+const mkdirp = require("mkdirp")
+const rimraf = require("rimraf")
+const merge = require("merge-recursive").recursive
 
+//Basic stuff
 const mod = process.argv[2] || process.cwd()
 const pjson = path.join(mod, "package.json")
 const pdata = require(pjson)
 
+function isInArray(field, value, list) {
+  if (list.indexOf(value) == -1) throw new Error("Field " + field + " can only have the values " + list.join(", ") + ", but got " + value)
+}
+
+//Conf
+const modes = ["bundle", "dir"]
+const scans = ["all", "entry", "manual"]
+const _conf = pdata["pkg-native"]
+const _defaults = {
+  scan: "all",
+  mode: "bundle",
+  modules: []
+}
+const conf = merge(_defaults, _conf)
+const mode = conf.mode
+const scan = conf.scan
+
+//Check
+isInArray("mode", mode, modes)
+isInArray("scan", scan, scans)
+
+//Paths
+const node_modules = path.join(mod, "node_modules")
+const loader = path.join(mod, "native-loader.js")
+const natives = path.join(mod, "natives")
+
 console.log("Pkg'ing module %s...", pdata.name)
 
-const {
-  getFlatTree
-} = require("./lib/tree")
+let btree = {}
 
 console.log("Scanning for natives...")
 
-const tree = getFlatTree([path.join(mod, pdata.bin[Object.keys(pdata.bin)]), Buffer.from(fs.readdirSync(path.join(mod, "node_modules")).map(m => 'require("' + m + '")').join(";\n"))], {
-  node: path.join(mod, "node_modules"),
+const tree = getFlatTree([path.join(mod, pdata.bin[Object.keys(pdata.bin)]), Buffer.from(fs.readdirSync(node_modules).map(m => 'require("' + m + '")').join(";\n"))], {
+  node: node_modules,
   main: mod
 })
-let btree = {}
 for (var pth in tree) {
   const obj = tree[pth]
   const b = obj.requires.filter(o => o.file == "bindings")
@@ -40,34 +71,17 @@ nfiles.forEach(file => nat.push({
   native: file.split("/")[1]
 }))
 
-const npaths = [
-  "build",
-  "build/Debug",
-  "build/Release",
-  "out/Debug",
-  "Debug",
-  "out/Release",
-  "build/default",
-  "compiled/" + process.version.substr(1) + "/" + process.platform + "/" + process.arch
-]
-
-nat.forEach(n => {
-  const spaths = npaths.map(p => path.join(mod, "node_modules", n.native, p, n.native + ".node"))
-  const epaths = spaths.filter(p => fs.existsSync(p))
-  if (!epaths.length) throw new Error("Couldn't find " + n.native + ".node. Tried:\n    - " + spaths.join("\n    - "))
-  n.module = epaths.pop()
-})
+nat.forEach(n =>
+  n.module = find_native(node_modules, n.native))
 
 console.log(nat)
 
 console.log("Copying modules...")
 
-const mkdirp = require("mkdirp")
-mkdirp.sync(path.join(mod, "natives"))
+mkdirp.sync(natives)
 
-nat.forEach(n => {
-  fs.writeFileSync(path.join(mod, "natives", n.native), fs.readFileSync(n.module))
-})
+nat.forEach(n =>
+  fs.writeFileSync(path.join(natives, n.native), fs.readFileSync(n.module)))
 
 console.log("Writing loader...")
 
@@ -80,8 +94,9 @@ nat.forEach(n => {
 
 console.log(meta)
 
-const l = fs.readFileSync(__dirname + "/loader.js").toString().replace('"MODENAME"', JSON.stringify("bundle")).replace('"MODEDIR"', JSON.stringify("")).replace('"METADATA"', JSON.stringify(meta))
-fs.writeFileSync(path.join(mod, "native-loader.js"), Buffer.from(l))
+const l = fs.readFileSync(__dirname + "/loader.js").toString()
+  .replace('"MODENAME"', mode).replace('"MODEDIR"', JSON.stringify("")).replace('"METADATA"', JSON.stringify(meta))
+fs.writeFileSync(loader, Buffer.from(l))
 
 const binf = path.join(mod, pdata.bin[Object.keys(pdata.bin)])
 console.log("Patching %s...", binf)
@@ -112,9 +127,12 @@ const pargs = ["-t", "node8-" + process.platform.replace(/[^a-z]/gmi), mod]
 const rest = () => {
   console.log("Restore %s...", binf)
   fs.writeFileSync(binf, obinc)
+  console.log("Cleanup...")
+  rimraf.sync(natives)
+  rimraf.sync(loader)
 }
 
-console.log("Running: pkg ", pargs.join(" "))
+console.log("Running: pkg", pargs.join(" "))
 pkg.exec(pargs)
   .then(rest)
   .catch(e => {
