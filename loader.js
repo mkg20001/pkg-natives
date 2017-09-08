@@ -13,16 +13,19 @@ function NativeLoader(mode, dir, meta, uid) {
     const _m = meta[mod]
     switch (mode) {
     case "bundle":
-      const from = path.join(__dirname, "natives", mod)
-      const to = path.join("/tmp/", uid, mod + ".node")
-      if (!fs.existsSync(to)) {
-        try {
-          fs.mkdirSync(path.join("/tmp/", uid))
-        } catch (e) {
-          if (!fs.existsSync(path.join("/tmp/", uid))) throw e
-        }
-        fs.writeFileSync(to, fs.readFileSync(from))
+      let tmpdir
+      if (process.platform.startsWith("win")) {
+        tmpdir = path.join(process.env.APPDATA, ".node-natives")
+        if (!fs.existsSync(tmpdir)) fs.mkdirSync(tmpdir)
+        tmpdir = path.join(tmpdir, uid)
+      } else {
+        tmpdir = path.join("/tmp/", uid)
       }
+      if (!fs.existsSync(tmpdir)) fs.mkdirSync(tmpdir)
+      const from = path.join(__dirname, "natives", mod)
+      const to = path.join(tmpdir, mod + ".node")
+      if (!fs.existsSync(to))
+        fs.writeFileSync(to, fs.readFileSync(from))
       _m.get_file = to
       break;
     }
