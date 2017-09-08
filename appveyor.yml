@@ -1,0 +1,22 @@
+# Test against the latest version of this Node.js version
+environment:
+  nodejs_version: "8"
+
+init: #fix for .cmd
+  - git config --global core.autocrlf true
+
+# Install scripts. (runs after repo cloning)
+install:
+  # Get the latest stable version of Node.js or io.js
+  - ps: Install-Product node $env:nodejs_version
+
+# Post-install test scripts.
+test_script:
+  # Output useful info for debugging.
+  - node --version
+  - npm --version
+  # run tests
+  - cmd /C .\win-test.cmd
+
+# Don't actually build.
+build: off
