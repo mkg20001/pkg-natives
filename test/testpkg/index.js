@@ -4,5 +4,6 @@ db.open(err => {
   if (err) throw err
   db.close(err => {
     if (err) throw err
+    console.log("DB open/close successful")
   })
 })
