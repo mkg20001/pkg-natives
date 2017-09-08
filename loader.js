@@ -3,7 +3,7 @@
 const path = require("path")
 const fs = require("fs")
 
-function NativeLoader(mode, dir, meta) {
+function NativeLoader(mode, dir, meta, uid) {
   const m = require("module")
   const oload = m._load
 
@@ -14,8 +14,15 @@ function NativeLoader(mode, dir, meta) {
     switch (mode) {
     case "bundle":
       const from = path.join(__dirname, "natives", mod)
-      const to = path.join("/tmp/", Math.random() + ".node")
-      fs.writeFileSync(to, fs.readFileSync(from))
+      const to = path.join("/tmp/", uid, mod + ".node")
+      if (!fs.existsSync(to)) {
+        try {
+          fs.mkdirSync(path.join("/tmp/", uid))
+        } catch (e) {
+          if (!fs.existsSync(path.join("/tmp/", uid))) throw e
+        }
+        fs.writeFileSync(to, fs.readFileSync(from))
+      }
       _m.get_file = to
       break;
     }
@@ -43,4 +50,4 @@ function NativeLoader(mode, dir, meta) {
     } else return oload(request, parent, ismain)
   }
 }
-global.NATIVE_LOADER = NativeLoader("MODENAME", "MODEDIR", "METADATA")
+global.NATIVE_LOADER = NativeLoader("MODENAME", "MODEDIR", "METADATA", "UNIQUE_ID")

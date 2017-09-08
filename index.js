@@ -2,6 +2,7 @@
 
 "use strict"
 
+//Required stuff
 const pkg = require("pkg")
 const fs = require("fs")
 const path = require("path")
@@ -12,6 +13,7 @@ const find_native = require("./lib/find_native")
 const mkdirp = require("mkdirp")
 const rimraf = require("rimraf")
 const merge = require("merge-recursive").recursive
+const uuid = require("uuid")
 
 //Basic stuff
 const mod = process.argv[2] || process.cwd()
@@ -34,6 +36,7 @@ const _defaults = {
 const conf = merge(_defaults, _conf)
 const mode = conf.mode
 const scan = conf.scan
+const entry = path.join(mod, pdata.bin[Object.keys(pdata.bin)])
 
 //Check
 isInArray("mode", mode, modes)
@@ -46,14 +49,15 @@ const natives = path.join(mod, "natives")
 
 console.log("Pkg'ing module %s...", pdata.name)
 
-let btree = {}
+console.log("Scanning for natives (%s)...", scan)
 
-console.log("Scanning for natives...")
-
-const tree = getFlatTree([path.join(mod, pdata.bin[Object.keys(pdata.bin)]), Buffer.from(fs.readdirSync(node_modules).map(m => 'require("' + m + '")').join(";\n"))], {
+const tree = getFlatTree(scan == "all" ? [entry, Buffer.from(fs.readdirSync(node_modules).map(m => 'require("' + m + '")').join(";\n"))] : scan == "entry" ? [entry] : [], {
   node: node_modules,
   main: mod
 })
+
+let btree = {}
+
 for (var pth in tree) {
   const obj = tree[pth]
   const b = obj.requires.filter(o => o.file == "bindings")
@@ -62,7 +66,7 @@ for (var pth in tree) {
 
 const nfiles = Object.keys(btree)
 
-console.log("Found natives in %s", nfiles.join(", "))
+console.log("Found %s native(s) (%s)", nfiles.length, nfiles.join(", ") || "<no files with natives were found>")
 
 let nat = []
 
@@ -74,7 +78,8 @@ nfiles.forEach(file => nat.push({
 nat.forEach(n =>
   n.module = find_native(node_modules, n.native))
 
-console.log(nat)
+nat.forEach(n =>
+  console.log("%s at %s (from %s)", n.native, n.module, n.file))
 
 console.log("Copying modules...")
 
@@ -92,10 +97,9 @@ nat.forEach(n => {
   }
 })
 
-console.log(meta)
-
 const l = fs.readFileSync(__dirname + "/loader.js").toString()
-  .replace('"MODENAME"', JSON.stringify(mode)).replace('"MODEDIR"', JSON.stringify("")).replace('"METADATA"', JSON.stringify(meta))
+  .replace('"MODENAME"', JSON.stringify(mode)).replace('"MODEDIR"', JSON.stringify(""))
+  .replace('"METADATA"', JSON.stringify(meta)).replace('"UNIQUE_ID"', JSON.stringify(pdata.name + "-natives-" + uuid()))
 fs.writeFileSync(loader, Buffer.from(l))
 
 const binf = path.join(mod, pdata.bin[Object.keys(pdata.bin)])
