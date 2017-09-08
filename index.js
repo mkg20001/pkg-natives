@@ -88,7 +88,7 @@ let nat = []
 
 nfiles.forEach(file => nat.push({
   file,
-  native: file.split(path.sep)[1]
+  native: upath.normalize(file).split("/")[1]
 }))
 
 nat.forEach(n => {
