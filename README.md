@@ -24,4 +24,7 @@ Put natives in a pkg binary
 
  This is due to the fact that otherwise the natives for the other version/os would have to be downloaded/built
 
+ The node version used is by defaul vMAJOR.0.0
+ To override that use the `PKG_TARGET` env variable
+
  This is a goal that may be achived later but not now
