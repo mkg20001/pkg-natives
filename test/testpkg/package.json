@@ -17,8 +17,8 @@
   "author": "Maciej Krüger <mkg20001@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "leveldown": "^1.7.2",
-    "pkg": "^4.2.4",
+    "leveldown": "^2.1.0",
+    "pkg": "^4.3.0-beta.1",
     "pkg-natives": "file:../../"
   },
   "devDependencies": {}
