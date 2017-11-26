@@ -14,7 +14,7 @@ cd testpkg
   #tests
   set +e
   cd $tmp
-  ./vanilla
+  DEBUG='*' ./vanilla
   ex=$?
   if [ $ex -ne 0 ]; then
     echo "pkg vanilla binary failed. (expected)"
@@ -22,7 +22,7 @@ cd testpkg
     echo "pkg vanilla was successful. something must be broken..."
     exit 2
   fi
-  ./native
+  DEBUG='*' ./native
   ex=$?
   if [ $ex -ne 0 ]; then
     echo "pkg native binary failed."

@@ -113,8 +113,8 @@ nat.forEach(n => {
 })
 
 const l = fs.readFileSync(__dirname + '/loader.js').toString()
-  .replace('"MODENAME"', JSON.stringify(mode)).replace('"MODEDIR"', JSON.stringify(''))
-  .replace('"METADATA"', JSON.stringify(meta)).replace('"UNIQUE_ID"', JSON.stringify(pdata.name + '-natives-' + uuid()))
+  .replace('\'MODENAME\'', JSON.stringify(mode)).replace('\'MODEDIR\'', JSON.stringify(''))
+  .replace('\'METADATA\'', JSON.stringify(meta)).replace('\'UNIQUE_ID\'', JSON.stringify(pdata.name + '-natives-' + uuid()))
 fs.writeFileSync(loader, Buffer.from(l))
 
 const binf = path.join(mod, pdata.bin[Object.keys(pdata.bin)])
